@@ -1,17 +1,37 @@
 import React, { useState } from "react";
-import "./App.css";
-import Player from "./componentes/Player";
 import ListManager from "./componentes/ListManager";
-import Track from "./types/Track";  // ✅ IMPORTACIÓN CORRECTA
+import Player from "./componentes/Player";
 
-function App() {
-  const [currentSongIndex, setCurrentSongIndex] = useState<number | null>(null);
+interface Track {
+  id: string;
+  src: string;
+  song: string;
+  artist: string;
+  cover: string;
+}
+
+const App: React.FC = () => {
   const [playlist, setPlaylist] = useState<Track[]>([]);
+  const [currentSongIndex, setCurrentSongIndex] = useState<number | null>(null);
 
-  const handleAddSongs = (newSongs: Track[]) => {
-    setPlaylist((prev) => [...prev, ...newSongs]); // Agregar nuevas canciones a la lista
+  // Agregar canciones a la playlist
+  const handleAddSongs = (songs: Track[]) => {
+    setPlaylist((prev) => [...prev, ...songs]);
   };
-  
+
+  // Seleccionar canción
+  const handleSelectSong = (index: number) => {
+    setCurrentSongIndex(index);
+  };
+
+  // Eliminar canción de la playlist
+  const handleRemoveSong = (id: string) => {
+    setPlaylist((prev) => prev.filter((track) => track.id !== id));
+
+    if (playlist[currentSongIndex!]?.id === id) {
+      setCurrentSongIndex(null); // Detener la reproducción si la canción en curso se elimina
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#cca469] gap-8 p-8">
@@ -23,10 +43,14 @@ function App() {
         />
       </div>
       <div className="w-[80%] flex flex-col justify-center items-center md:gap-2 ">
-      <ListManager onSelectSong={setCurrentSongIndex} onAddSongs={handleAddSongs} />
+        <ListManager 
+          onSelectSong={handleSelectSong} 
+          onAddSongs={handleAddSongs} 
+          onRemoveSong={handleRemoveSong} 
+        />
       </div>
     </div>
-  );  
-}
+  );
+};
 
 export default App;

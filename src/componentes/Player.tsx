@@ -57,6 +57,24 @@ const Player: React.FC<PlayerProps> = ({ playlist: initialPlaylist, currentSongI
     }
   };
 
+  const handleRemoveSong = (id: string) => {
+    if (playlist.current.size() > 1) {
+      playlist.current.remove(playlist.current.findIndex((track: Track) => track.id === id));
+  
+      if (currentNode?.value.id === id) {
+        if (currentNode.next) {
+          setCurrentNode(currentNode.next);
+          setCurrentSongIndex(currentSongIndex !== null ? currentSongIndex + 1 : 0);
+        } else {
+          setCurrentNode(playlist.current.getHead());
+          setCurrentSongIndex(0);
+          setIsPlaying(false);
+        }
+      }
+    }
+  };
+  
+
   const handleBackwardClick = () => {
     if (!audioRef.current) return;
   

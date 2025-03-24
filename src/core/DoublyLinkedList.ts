@@ -47,6 +47,21 @@ export class DoublyLinkedList<T> {
     this.length++;
   }
 
+  findIndex(predicate: (value: T) => boolean): number {
+    let current = this.head;
+    let index = 0;
+
+    while (current) {
+      if (predicate(current.value)) {
+        return index;
+      }
+      current = current.next;
+      index++;
+    }
+
+    return -1;
+  }
+
   insert(index: number, value: T): void {
     if (index <= 0) {
       this.prepend(value);
