@@ -20,13 +20,18 @@ const Player: React.FC<{ currentSongIndex: number | null }> = ({ currentSongInde
 
   // Llenar la lista de reproducción al montar
   useEffect(() => {
-    tracks.forEach((track) => playlist.current.append(track));
+    if (playlist.current.getHead() === null) {
+      tracks.forEach((track) => playlist.current.append(track));
+    }
   }, []);
 
   // Cambiar de canción cuando el índice cambia
   useEffect(() => {
-    if (currentSongIndex !== null) {
+    if (currentSongIndex !== null && currentSongIndex >= 0 && currentSongIndex < tracks.length) {
       setCurrentNode(playlist.current.getAt(currentSongIndex));
+    }
+    if (!currentNode) {
+      setCurrentNode(playlist.current.getHead());
     }
   }, [currentSongIndex]);
 
@@ -53,8 +58,12 @@ const Player: React.FC<{ currentSongIndex: number | null }> = ({ currentSongInde
 
   // Canción anterior
   const prevTrack = () => {
-    if (currentNode?.prev) {
-      setCurrentNode(currentNode.prev);
+    if (audioRef.current) {
+      if (audioRef.current.currentTime > 2) {
+        audioRef.current.currentTime = 0;
+      } else if (currentNode?.prev) {
+        setCurrentNode(currentNode.prev);
+      }
     }
   };
 
@@ -71,8 +80,18 @@ const Player: React.FC<{ currentSongIndex: number | null }> = ({ currentSongInde
   // Manejo del tiempo de la canción
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.ontimeupdate = () => setSongCurrentTime(Math.floor(audioRef.current!.currentTime));
-      audioRef.current.onloadedmetadata = () => setSongMaxTime(Math.floor(audioRef.current!.duration));
+      const audio = audioRef.current;
+
+      const updateTime = () => setSongCurrentTime(Math.floor(audio.currentTime));
+      const setMetadata = () => setSongMaxTime(Math.floor(audio.duration));
+
+      audio.ontimeupdate = updateTime;
+      audio.onloadedmetadata = setMetadata;
+
+      return () => {
+        audio.ontimeupdate = null;
+        audio.onloadedmetadata = null;
+      };
     }
   }, [currentNode]);
 
@@ -85,15 +104,35 @@ const Player: React.FC<{ currentSongIndex: number | null }> = ({ currentSongInde
     }
   };
 
-  // Cambio de canción cuando el nodo cambia
-  useEffect(() => {
-    if (audioRef.current && currentNode) {
-      audioRef.current.src = currentNode.value.src;
-      if (isPlaying) {
-        audioRef.current.play();
+// Cambio de canción cuando el nodo cambia
+useEffect(() => {
+  if (audioRef.current && currentNode) {
+    audioRef.current.src = currentNode.value.src;
+
+    audioRef.current.onended = () => {
+      if (isRepeat === "repeat-1") {
+        // Repetir la misma canción
+        audioRef.current!.currentTime = 0;
+        audioRef.current!.play();
+      } else if (currentNode.next) {
+        // Ir a la siguiente canción si hay una disponible
+        setCurrentNode(currentNode.next);
+      } else if (isRepeat === "repeat-all") {
+        // Volver a la primera canción si se repite toda la lista
+        setCurrentNode(playlist.current.getHead());
+      } else {
+        // Modo "repeat-off": Volver a la primera pero sin reproducir automáticamente
+        setCurrentNode(playlist.current.getHead());
+        setIsPlaying(false);
       }
+    };
+
+    if (isPlaying) {
+      audioRef.current.play();
     }
-  }, [currentNode]);
+  }
+}, [currentNode]);
+
 
   // Cambio de tiempo con la barra de progreso
   const handleInputRange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +144,7 @@ const Player: React.FC<{ currentSongIndex: number | null }> = ({ currentSongInde
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#F8D7A6] gap-8 p-8">
+    <div className="flex justify-center items-center min-h-screen bg-[#502626] gap-8 p-8">
       {/* Reproductor de música */}
       <div className="overflow-hidden bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px]">
         {currentNode ? (
