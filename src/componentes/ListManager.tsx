@@ -17,6 +17,28 @@ interface ListManagerProps {
 
 const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onRemoveSong }) => {
   const [customTracks, setCustomTracks] = useState<Track[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (index: number) => {
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const updatedTracks = [...customTracks];
+    const [movedTrack] = updatedTracks.splice(draggedIndex, 1);
+    updatedTracks.splice(index, 0, movedTrack);
+
+    setCustomTracks(updatedTracks);
+    onAddSongs(updatedTracks); // Pasar la lista actualizada al Player
+
+    setDraggedIndex(null);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -40,28 +62,51 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
       onRemoveSong(id);
     }
   };
-  return (
-    <div className="w-full p-4 bg-gray-900 text-white rounded-xl">
-      <h2 className="text-xl font-semibold mb-3">Lista de Reproducción</h2>
 
-      {/* Botón para seleccionar archivos */}
-      <input type="file" accept="audio/*" multiple onChange={handleFileUpload} className="mb-3" />
+  return (
+    <div className="w-full p-5 bg-gray-900 text-white rounded-xl shadow-lg">
+      <h2 className="text-xl font-semibold mb-4">Lista de Reproducción</h2>
+
+      {/* Input para subir archivos */}
+      <input
+        type="file"
+        accept="audio/*"
+        multiple
+        onChange={handleFileUpload}
+        className="mb-4 p-2 border border-gray-700 rounded-lg bg-gray-800 text-gray-300 cursor-pointer transition-all hover:bg-gray-700"
+      />
 
       {/* Lista de canciones */}
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {customTracks.map((song, index) => (
-          <li key={song.id} className="flex items-center gap-3 p-2 bg-gray-800 rounded-lg">
+          <li
+            key={song.id}
+            className={`flex items-center gap-3 p-3 bg-gray-800 rounded-lg transition-all 
+              ${draggedIndex === index ? "opacity-50" : "hover:shadow-lg hover:bg-gray-700"}`}
+            draggable
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={handleDragOver}
+            onDrop={() => handleDrop(index)}
+          >
+            {/* Imagen de la canción */}
             <img
               src={song.cover}
               alt={song.song}
-              className="w-12 h-12 rounded-lg cursor-pointer"
+              className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
               onClick={() => onSelectSong(index)}
             />
+
+            {/* Información de la canción */}
             <div className="flex-1 cursor-pointer" onClick={() => onSelectSong(index)}>
-              <p className="font-semibold">{song.song}</p>
+              <p className="font-semibold text-gray-200">{song.song}</p>
               <p className="text-sm text-gray-400">{song.artist}</p>
             </div>
-            <button onClick={() => handleRemove(song.id)} className="text-red-500 hover:text-red-400">
+
+            {/* Botón de eliminar */}
+            <button
+              onClick={() => handleRemove(song.id)}
+              className="text-red-500 hover:text-red-400 transition-all"
+            >
               <Trash2 size={20} />
             </button>
           </li>

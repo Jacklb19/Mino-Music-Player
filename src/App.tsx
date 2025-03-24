@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ListManager from "./componentes/ListManager";
 import Player from "./componentes/Player";
+import Song from "./componentes/Song";
 
 interface Track {
   id: string;
@@ -33,16 +34,32 @@ const App: React.FC = () => {
     }
   };
 
+  const currentTrack = currentSongIndex !== null ? playlist[currentSongIndex] : null;
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#cca469] gap-8 p-8">
-      <div className="w-[80%] flex flex-col justify-center items-center md:gap-1 ">
+      {/* Muestra la información de la canción */}
+      <div className="w-[80%] flex flex-col justify-center items-center md:gap-1">
+        {currentTrack && (
+          <Song 
+            cover={currentTrack.cover}
+            song={currentTrack.song}
+            artist={currentTrack.artist}
+          />
+        )}
+      </div>
+
+      {/* Controles del reproductor */}
+      <div className="w-[80%] flex flex-col justify-center items-center md:gap-1">
         <Player 
           playlist={playlist} 
           currentSongIndex={currentSongIndex} 
           setCurrentSongIndex={setCurrentSongIndex} 
         />
       </div>
-      <div className="w-[80%] flex flex-col justify-center items-center md:gap-2 ">
+
+      {/* Lista de canciones */}
+      <div className="w-[80%] flex flex-col justify-center items-center md:gap-2">
         <ListManager 
           onSelectSong={handleSelectSong} 
           onAddSongs={handleAddSongs} 

@@ -31,7 +31,8 @@ const Player: React.FC<PlayerProps> = ({ playlist: initialPlaylist, currentSongI
     playlist.current = new DoublyLinkedList<Track>();
     initialPlaylist.forEach((track) => playlist.current.append(track));
     if (playlist.current.size() > 0) setCurrentNode(playlist.current.getHead());
-  }, [initialPlaylist]);
+  }, [initialPlaylist]); // Se ejecuta cuando cambia la playlist
+  
 
   useEffect(() => {
     if (currentSongIndex !== null && playlist.current.size() > 0) {
@@ -165,43 +166,45 @@ const Player: React.FC<PlayerProps> = ({ playlist: initialPlaylist, currentSongI
   
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#502626] gap-8 p-8">
-      <div className="overflow-hidden bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px]">
-        {currentNode ? (
-          <>
-            <img src={currentNode.value.cover} alt={currentNode.value.song} className="rounded-xl w-full" />
-            <h2 className="text-xl font-bold mt-4">{currentNode.value.song}</h2>
-            <h3 className="text-gray-400">{currentNode.value.artist}</h3>
-            <audio ref={audioRef} />
-            
-            {/* Barra de progreso funcional */}
-            <input
-              type="range"
-              min={0}
-              max={songMaxTime || 1}
-              value={songCurrentTime}
-              onChange={handleSeekChange}
-              className="w-full mt-2"
-            />
-            
-            <PlayerControls
-              isPlaying={isPlaying}
-              isShuffle={isShuffle}
-              isRepeat={isRepeat}
-              togglePlayPause={togglePlayPause}
-              nextTrack={handleForwardClick}
-              prevTrack={handleBackwardClick}
-              handleShuffleClick={() => setShuffle(!isShuffle)}
-              handleRepeatClick={handleRepeatClick}
-            />
-            <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} className="mt-2" />
-          </>
-        ) : (
-          <p>No songs available</p>
-        )}
-      </div>
+    <div className="flex flex-col items-center p-4 bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px]">
+      <audio ref={audioRef} />
+      
+      {/* Barra de progreso */}
+      <input
+        type="range"
+        min={0}
+        max={songMaxTime || 1}
+        value={songCurrentTime}
+        onChange={handleSeekChange}
+        className="w-full mt-2"
+      />
+      
+      {/* Controles del reproductor */}
+      <PlayerControls
+        isPlaying={isPlaying}
+        isShuffle={isShuffle}
+        isRepeat={isRepeat}
+        togglePlayPause={togglePlayPause}
+        nextTrack={handleForwardClick}
+        prevTrack={handleBackwardClick}
+        handleShuffleClick={() => setShuffle(!isShuffle)}
+        handleRepeatClick={handleRepeatClick}
+      />
+  
+      {/* Control de volumen */}
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={volume}
+        onChange={handleVolumeChange}
+        className="mt-2"
+      />
     </div>
   );
-};
+  };
+  
+  export default Player;
 
-export default Player;
+
