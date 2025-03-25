@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import * as mm from "music-metadata-browser";
 
@@ -41,7 +41,7 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
-
+  
     const newTracks: Track[] = await Promise.all(
       Array.from(files).map(async (file) => {
         try {
@@ -49,13 +49,13 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
           const title = metadata.common.title || file.name.replace(/\.[^/.]+$/, "");
           const artist = metadata.common.artist || "Desconocido";
           let cover = "/default-cover.jpg";
-
+  
           if (metadata.common.picture?.length) {
             const picture = metadata.common.picture[0];
             const blob = new Blob([picture.data], { type: picture.format });
             cover = URL.createObjectURL(blob);
           }
-
+  
           return {
             id: crypto.randomUUID(),
             src: URL.createObjectURL(file),
@@ -75,14 +75,15 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
         }
       })
     );
-
-    setCustomTracks((prevTracks) => {
-      const updatedTracks = [...prevTracks, ...newTracks];
-      onAddSongs(updatedTracks); // Actualizar la lista en el Player
-      return updatedTracks;
-    });
-    event.target.value = ""
+  
+    setCustomTracks((prevTracks) => [...prevTracks, ...newTracks]);
+    event.target.value = "";
   };
+  
+  useEffect(() => {
+    onAddSongs(customTracks);
+  }, [customTracks]);
+  
 
   // Manejo de eliminación de canciones
   const handleRemove = (id: string) => {

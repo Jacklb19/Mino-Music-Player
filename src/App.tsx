@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import ListManager from "./componentes/ListManager";
 import Player from "./componentes/Player";
 import Song from "./componentes/Song";
+import { Buffer } from "buffer";
+(window as any).Buffer = Buffer;
+
 
 interface Track {
   id: string;
