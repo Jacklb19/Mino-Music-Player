@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Trash2 } from "lucide-react";
 import * as mm from "music-metadata-browser";
 
@@ -23,6 +23,9 @@ const ListManager: React.FC<ListManagerProps> = ({
 }) => {
   const [customTracks, setCustomTracks] = useState<Track[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // Referencias para cada elemento de la lista
+  const itemRefs = useRef<{ [key: string]: HTMLLIElement | null }>({});
 
   // Manejo de arrastrar y soltar
   const handleDragStart = (index: number) => setDraggedIndex(index);
@@ -51,7 +54,7 @@ const ListManager: React.FC<ListManagerProps> = ({
           const metadata = await mm.parseBlob(file);
           const title = metadata.common.title || file.name.replace(/\.[^/.]+$/, "");
           const artist = metadata.common.artist || "Desconocido";
-          // Se utiliza la imagen por defecto ubicada en public/assets/cover-imgs/default.png
+          // Imagen por defecto si no se encuentran metadatos
           let cover = "/assets/cover-imgs/default.png";
 
           if (metadata.common.picture?.length) {
@@ -95,11 +98,13 @@ const ListManager: React.FC<ListManagerProps> = ({
     onRemoveSong(id);
   };
 
-  // Manejo de selección de canciones
+  // Manejo de selección de canciones: se llama a onSelectSong y se hace scroll a la canción
   const handleSelect = (id: string) => {
     const indexInPlaylist = customTracks.findIndex((track) => track.id === id);
     if (indexInPlaylist !== -1) {
       onSelectSong(indexInPlaylist);
+      // Hacer scroll hacia el elemento seleccionado
+      itemRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
@@ -116,46 +121,46 @@ const ListManager: React.FC<ListManagerProps> = ({
         className="mb-4 p-2 border border-gray-700 rounded-lg bg-gray-800 text-gray-300 cursor-pointer transition-all hover:bg-gray-700"
       />
 
-      {/* Lista de canciones */}
-      <ul className="space-y-3">
-        {customTracks.map((song, index) => (
-          <li
-            key={song.id}
-            className={`flex items-center gap-3 p-3 bg-gray-800 rounded-lg transition-all 
-              ${draggedIndex === index ? "opacity-50" : "hover:shadow-lg hover:bg-gray-700"}`}
-            draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragOver={handleDragOver}
-            onDrop={() => handleDrop(index)}
-          >
-            {/* Aquí podemos reutilizar el componente Song para mostrar la interfaz de cada canción */}
-            <div className="flex-1 cursor-pointer" onClick={() => handleSelect(song.id)}>
-              {/* Se puede renderizar el componente Song en una versión más compacta, o bien usarlo en la vista principal */}
-              <div className="flex items-center">
-                <img
-                  src={song.cover}
-                  alt={song.song}
-                  className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
-                />
-                <div className="ml-3">
-                  <p className="font-semibold text-gray-200">{song.song}</p>
-                  <p className="text-sm text-gray-400">{song.artist}</p>
+      {/* Contenedor con scroll para la lista de canciones */}
+      <div className="max-h-80 overflow-y-auto">
+        <ul className="space-y-3">
+          {customTracks.map((song, index) => (
+            <li
+                  key={song.id}
+                  ref={(el) => { itemRefs.current[song.id] = el; }}
+                  className={`flex items-center gap-3 p-3 bg-gray-800 rounded-lg transition-all 
+                    ${draggedIndex === index ? "opacity-50" : "hover:shadow-lg hover:bg-gray-700"}`}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop(index)}
+                >
+              <div className="flex-1 cursor-pointer" onClick={() => handleSelect(song.id)}>
+                <div className="flex items-center">
+                  <img
+                    src={song.cover}
+                    alt={song.song}
+                    className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                  />
+                  <div className="ml-3">
+                    <p className="font-semibold text-gray-200">{song.song}</p>
+                    <p className="text-sm text-gray-400">{song.artist}</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Botón de eliminar (solo se muestra si hay más de una canción) */}
-            {customTracks.length > 1 && (
-              <button
-                onClick={() => handleRemove(song.id)}
-                className="text-red-500 hover:text-red-400 transition-all"
-              >
-                <Trash2 size={20} />
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+              {customTracks.length > 1 && (
+                <button
+                  onClick={() => handleRemove(song.id)}
+                  className="text-red-500 hover:text-red-400 transition-all"
+                >
+                  <Trash2 size={20} />
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
