@@ -1,15 +1,22 @@
+Reproductor de música
+Repositorio: https://github.com/Jacklb19/Mino-Music-Player.git 
 REPRODUCTOR DE MUSICA
 JOSE LUIS BURBANO BUCHELLY
-
-PARA CORRER EL REPRODUCTOR DE MUSICA SE NECESITA
+TECNOLOGIAS USADAS
 -node.js (Version lts (En mi caso tengo la v22.14.0))
-INSTALAR
+-react
+-tailwind
+-typescript
+-music-metadata-browser
+PARA CORRER LA APLICACIÓN SE DEBE:
 -npm install
 -npm run dev
-
-PARA AGREGAR CANCIONES SE DEBE DARLE AL BOTON + EN "NOW PLAYING"
-Y AGREGARLAS DESDE UNA CARPETA QUE TENGAS EN TU DISPOSITVO (Nota: No se pueden agregar carpetas enteras)
+FUNCIONES PLUS:
+SE NECESITA AGREGAR LAS CANCIONES DESDE UNA CARPETA QUE TENGAS EN TU DISPOSITVO (Nota: No se pueden agregar carpetas enteras)
 SE PUEDE CAMBIAR DE POSICION CADA CANCION ARRASTRANDOLA Y SOLTANDOLA DONDE QUIERAS. 
+BOTON DE REPITIR LISTA 🔁
+BARRA DE VOLUMEN Y DE REPRODUCCION
+
 
 ```js
 export default tseslint.config({
