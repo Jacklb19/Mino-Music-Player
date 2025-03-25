@@ -8,7 +8,12 @@ interface SongProps {
 
 const Song: React.FC<SongProps> = ({ cover, song, artist }) => {
   return (
-    <div className="text-center p-4 bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px] min-h-[250px] flex flex-col justify-center items-center">
+    // Caja exterior sin márgenes externos para que respete el contenedor padre
+    <div className="w-full flex flex-col justify-start items-center bg-zinc-900 h-[490px]
+       rounded-[35px] transition-all hover:scale-[1.01] mb-6 md:mb-0 
+       drop-shadow-[0px_0px_10px_rgba(0,0,0,1)] 
+        md:drop-shadow-[0px_0px_10px_rgba(0,0,0,1)]
+        ml:hover:drop-shadow-[0px_0px_15px_rgba(0,0,0,1)]">
       {song ? (
         <>
           <img 

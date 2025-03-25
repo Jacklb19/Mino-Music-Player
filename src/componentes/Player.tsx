@@ -36,25 +36,20 @@ const Player: React.FC<PlayerProps> = ({
   const [songMaxTime, setSongMaxTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-// Reemplaza los dos efectos que reconstruyen el DoublyLinkedList y actualizan el currentNode por este efecto combinado:
-useEffect(() => {
-  // Reconstruir la lista interna
-  playlist.current = new DoublyLinkedList<Track>();
-  initialPlaylist.forEach((track) => playlist.current.append(track));
+  // Reconstruye la lista interna y ajusta el nodo actual
+  useEffect(() => {
+    playlist.current = new DoublyLinkedList<Track>();
+    initialPlaylist.forEach((track) => playlist.current.append(track));
 
-  // Actualizar el nodo actual según el currentSongIndex
-  if (currentSongIndex !== null && currentSongIndex < playlist.current.size()) {
-    setCurrentNode(playlist.current.getAt(currentSongIndex));
-  } else if (playlist.current.size() > 0) {
-    // Si no hay un índice válido pero la lista no está vacía, se inicia en la primera canción
-    setCurrentNode(playlist.current.getHead());
-    setCurrentSongIndex(0);
-  } else {
-    // Si la lista está vacía
-    setCurrentNode(null);
-  }
-}, [initialPlaylist, currentSongIndex]);
-
+    if (currentSongIndex !== null && currentSongIndex < playlist.current.size()) {
+      setCurrentNode(playlist.current.getAt(currentSongIndex));
+    } else if (playlist.current.size() > 0) {
+      setCurrentNode(playlist.current.getHead());
+      setCurrentSongIndex(0);
+    } else {
+      setCurrentNode(null);
+    }
+  }, [initialPlaylist, currentSongIndex, setCurrentSongIndex]);
 
   // Play / Pause
   const togglePlayPause = () => {
@@ -97,11 +92,10 @@ useEffect(() => {
     setIsRepeat(repeatModes[(repeatModes.indexOf(isRepeat) + 1) % repeatModes.length]);
   };
 
-  // Actualización automática del tiempo de reproducción
+  // Actualización del tiempo de reproducción
   useEffect(() => {
     if (audioRef.current) {
       const audio = audioRef.current;
-
       const updateTime = () => setSongCurrentTime(Math.floor(audio.currentTime));
       const setMetadata = () => setSongMaxTime(Math.floor(audio.duration));
 
@@ -129,6 +123,7 @@ useEffect(() => {
     if (audioRef.current) audioRef.current.volume = newVolume;
   };
 
+  // Manejo del final de la canción y reproducción continua
   useEffect(() => {
     if (audioRef.current && currentNode) {
       if (audioRef.current.src !== currentNode.value.src) {
@@ -154,10 +149,13 @@ useEffect(() => {
         audioRef.current.play();
       }
     }
-  }, [currentNode, isPlaying, isRepeat]);
+  }, [currentNode, isPlaying, isRepeat, currentSongIndex, setCurrentSongIndex]);
 
   return (
-    <div className="flex flex-col items-center p-4 bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px]">
+    <div className="w-full flex flex-col justify-center items-center bg-zinc-900 rounded-[35px] 
+     transition-all hover:scale-[1.01] p-4 drop-shadow-[0px_0px_10px_rgba(0,0,0,1)] 
+      md:drop-shadow-[0px_0px_10px_rgba(0,0,0,1)]
+      ml:hover:drop-shadow-[0px_0px_15px_rgba(0,0,0,1)]">
       <audio ref={audioRef} />
 
       {/* Barra de progreso */}
@@ -190,7 +188,7 @@ useEffect(() => {
         step="0.01"
         value={volume}
         onChange={handleVolumeChange}
-        className="mt-2"
+        className="w-full mt-2"
       />
     </div>
   );

@@ -15,8 +15,8 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
     <div className="h-auto w-full flex justify-center items-center gap-4">
       {/* Shuffle */}
       <button onClick={handleShuffleClick} className="w-8 h-8">
-        <img src="/assets/icons/shuffle-icon.png" alt="shuffle-icon" 
-        className={`h-[20px] object-cover invert hover:scale-105 ${isShuffle ? "" : "opacity-50"}`} />
+        {/*<img src="/assets/icons/shuffle-icon.png" alt="shuffle-icon" 
+        className={`h-[20px] object-cover invert hover:scale-105 ${isShuffle ? "" : "opacity-50"}`} />*/}
       </button>
 
       {/* Canción anterior */}
