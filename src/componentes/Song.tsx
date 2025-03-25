@@ -12,7 +12,7 @@ const Song: React.FC<SongProps> = ({ cover, song, artist }) => {
       {song ? (
         <>
           <img 
-            src={cover || "/default-cover.jpg"} 
+            src={cover && cover !== "" ? cover : "/assets/cover-imgs/default.png"} 
             alt={song} 
             className="rounded-xl w-full max-h-60 object-cover"
           />

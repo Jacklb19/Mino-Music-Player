@@ -5,7 +5,6 @@ import Song from "./componentes/Song";
 import { Buffer } from "buffer";
 (window as any).Buffer = Buffer;
 
-
 interface Track {
   id: string;
   src: string;
@@ -65,13 +64,12 @@ const App: React.FC = () => {
     });
   };
   
-  
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#cca469] gap-8 p-8">
       {/* Muestra la información de la canción */}
       <div className="text-center p-4 bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px] min-h-[250px] flex flex-col justify-center items-center border--4">
         <Song
-          cover={currentTrack?.cover || "/default-cover.jpg"}
+          cover={currentTrack?.cover || "/assets/cover-imgs/default.png"}
           song={currentTrack?.song || "No hay canción seleccionada"}
           artist={currentTrack?.artist || "Desconocido"}
         />

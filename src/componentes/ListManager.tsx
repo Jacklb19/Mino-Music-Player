@@ -16,13 +16,16 @@ interface ListManagerProps {
   onRemoveSong: (id: string) => void;
 }
 
-const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onRemoveSong }) => {
+const ListManager: React.FC<ListManagerProps> = ({
+  onSelectSong,
+  onAddSongs,
+  onRemoveSong,
+}) => {
   const [customTracks, setCustomTracks] = useState<Track[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   // Manejo de arrastrar y soltar
   const handleDragStart = (index: number) => setDraggedIndex(index);
-
   const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => event.preventDefault();
 
   const handleDrop = (index: number) => {
@@ -41,21 +44,22 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
-  
+
     const newTracks: Track[] = await Promise.all(
       Array.from(files).map(async (file) => {
         try {
           const metadata = await mm.parseBlob(file);
           const title = metadata.common.title || file.name.replace(/\.[^/.]+$/, "");
           const artist = metadata.common.artist || "Desconocido";
-          let cover = "/default-cover.jpg";
-  
+          // Se utiliza la imagen por defecto ubicada en public/assets/cover-imgs/default.png
+          let cover = "/assets/cover-imgs/default.png";
+
           if (metadata.common.picture?.length) {
             const picture = metadata.common.picture[0];
             const blob = new Blob([picture.data], { type: picture.format });
             cover = URL.createObjectURL(blob);
           }
-  
+
           return {
             id: crypto.randomUUID(),
             src: URL.createObjectURL(file),
@@ -70,20 +74,20 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
             src: URL.createObjectURL(file),
             song: file.name.replace(/\.[^/.]+$/, ""),
             artist: "Desconocido",
-            cover: "/default-cover.jpg",
+            cover: "/assets/cover-imgs/default.png",
           };
         }
       })
     );
-  
+
     setCustomTracks((prevTracks) => [...prevTracks, ...newTracks]);
     event.target.value = "";
   };
-  
+
+  // Notificar al componente padre cuando cambia la lista de canciones
   useEffect(() => {
     onAddSongs(customTracks);
-  }, [customTracks]);
-  
+  }, [customTracks, onAddSongs]);
 
   // Manejo de eliminación de canciones
   const handleRemove = (id: string) => {
@@ -124,21 +128,23 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(index)}
           >
-            {/* Imagen de la canción */}
-            <img
-              src={song.cover}
-              alt={song.song}
-              className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
-              onClick={() => handleSelect(song.id)}
-            />
-
-            {/* Información de la canción */}
+            {/* Aquí podemos reutilizar el componente Song para mostrar la interfaz de cada canción */}
             <div className="flex-1 cursor-pointer" onClick={() => handleSelect(song.id)}>
-              <p className="font-semibold text-gray-200">{song.song}</p>
-              <p className="text-sm text-gray-400">{song.artist}</p>
+              {/* Se puede renderizar el componente Song en una versión más compacta, o bien usarlo en la vista principal */}
+              <div className="flex items-center">
+                <img
+                  src={song.cover}
+                  alt={song.song}
+                  className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                />
+                <div className="ml-3">
+                  <p className="font-semibold text-gray-200">{song.song}</p>
+                  <p className="text-sm text-gray-400">{song.artist}</p>
+                </div>
+              </div>
             </div>
 
-            {/* Botón de eliminar */}
+            {/* Botón de eliminar (solo se muestra si hay más de una canción) */}
             {customTracks.length > 1 && (
               <button
                 onClick={() => handleRemove(song.id)}
