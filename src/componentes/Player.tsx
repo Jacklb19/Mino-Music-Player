@@ -75,7 +75,6 @@ const Player: React.FC<PlayerProps> = ({ playlist: initialPlaylist, currentSongI
     }
   };
   
-
   const handleBackwardClick = () => {
     if (!audioRef.current) return;
   

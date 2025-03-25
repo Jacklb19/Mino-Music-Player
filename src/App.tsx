@@ -17,8 +17,17 @@ const App: React.FC = () => {
 
   // Agregar canciones a la playlist
   const handleAddSongs = (songs: Track[]) => {
-    setPlaylist((prev) => [...prev, ...songs]);
-  };
+    setPlaylist((prev) => {
+      const updatedPlaylist = [...prev, ...songs];
+  
+      // Si no hay una canción seleccionada, establecer la primera canción agregada
+      if (updatedPlaylist.length > 0 && currentSongIndex === null) {
+        setCurrentSongIndex(0);
+      }
+  
+      return updatedPlaylist;
+    });
+  };  
 
   // Seleccionar canción
   const handleSelectSong = (index: number) => {
@@ -39,18 +48,16 @@ const App: React.FC = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#cca469] gap-8 p-8">
       {/* Muestra la información de la canción */}
-      <div className="w-[80%] flex flex-col justify-center items-center md:gap-1">
-        {currentTrack && (
+      <div className="text-center p-4 bg-zinc-700 rounded-[35px] w-[90%] md:rounded-[30px] min-h-[250px] flex flex-col justify-center items-center border--4">
           <Song 
-            cover={currentTrack.cover}
-            song={currentTrack.song}
-            artist={currentTrack.artist}
+          cover={currentTrack?.cover} 
+          song={currentTrack?.song} 
+          artist={currentTrack?.artist}
           />
-        )}
       </div>
 
       {/* Controles del reproductor */}
-      <div className="w-[80%] flex flex-col justify-center items-center md:gap-1">
+      <div className="w-[80%] flex flex-col justify-center items-center md:gap-2">
         <Player 
           playlist={playlist} 
           currentSongIndex={currentSongIndex} 
@@ -59,7 +66,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Lista de canciones */}
-      <div className="w-[80%] flex flex-col justify-center items-center md:gap-2">
+      <div className="w-[80%] flex flex-col justify-center items-center md:gap-3">
         <ListManager 
           onSelectSong={handleSelectSong} 
           onAddSongs={handleAddSongs} 

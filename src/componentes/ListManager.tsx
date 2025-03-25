@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2 } from "lucide-react"; // Icono de eliminación
+import { Trash2 } from "lucide-react"; 
 
 interface Track {
   id: string;
@@ -12,7 +12,7 @@ interface Track {
 interface ListManagerProps {
   onSelectSong: (index: number) => void;
   onAddSongs: (songs: Track[]) => void;
-  onRemoveSong: (id: string) => void; // Nueva función para eliminar canción
+  onRemoveSong: (id: string) => void; 
 }
 
 const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onRemoveSong }) => {
@@ -62,6 +62,15 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
       onRemoveSong(id);
     }
   };
+  
+  const handleSelect = (id: string) => {
+    const indexInPlaylist = customTracks.findIndex(track => track.id === id);
+    if (indexInPlaylist !== -1) {
+      onSelectSong(indexInPlaylist);
+    }
+  };
+  
+  
 
   return (
     <div className="w-full p-5 bg-gray-900 text-white rounded-xl shadow-lg">
@@ -90,14 +99,14 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
           >
             {/* Imagen de la canción */}
             <img
-              src={song.cover}
-              alt={song.song}
-              className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
-              onClick={() => onSelectSong(index)}
+                src={song.cover}
+                alt={song.song}
+                className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => handleSelect(song.id)} 
             />
 
             {/* Información de la canción */}
-            <div className="flex-1 cursor-pointer" onClick={() => onSelectSong(index)}>
+            <div className="flex-1 cursor-pointer" onClick={() => handleSelect(song.id)}>
               <p className="font-semibold text-gray-200">{song.song}</p>
               <p className="text-sm text-gray-400">{song.artist}</p>
             </div>
