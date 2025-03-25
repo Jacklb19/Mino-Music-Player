@@ -137,7 +137,7 @@ const ListManager: React.FC<ListManagerProps> = ({
       {/* Contenedor "envoltorio" con borde redondeado y overflow-hidden */}
       <div className="rounded-xl overflow-hidden p-2 pt-6">
         {/* Este es el área que hace scroll */}
-        <div className="max-h-140 overflow-y-auto custom-scrollbar bg-zinc-900  rounded-[35px]  
+        <div className="max-h-130 overflow-y-auto custom-scrollbar bg-zinc-900  rounded-[35px]  
             md:rounded-[40px] p-2">
           <ul className="space-y-2  ">
             {customTracks.map((song, index) => (
@@ -161,9 +161,9 @@ const ListManager: React.FC<ListManagerProps> = ({
                       alt={song.song}
                       className="h-[50px] object-contain rounded-[10px]"
                     />
-                    <div className="pl-[10px] text-[12px] font-regular  ">
+                    <div className="pl-[12px] pt-[5px] text-[14px] font-regular  ">
                       <p className="text-[20px] font-semibold text-gray-200 leading-tight">{song.song}</p>
-                      <p className="text-[12px] font-regular text-gray-400">{song.artist}</p>
+                      <p className="text-[12px] pt-[4px] font-regular text-gray-400">{song.artist}</p>
                     </div>
                   </div>
                 </div>

@@ -45,7 +45,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row bg-orange-2000 gap-0.5 p-9 pt-10">
+    <div className="flex flex-col md:flex-row bg-slate-950 gap-0.5 p-9 pt-10">
       {/* IZQUIERDA: Lista de Reproducción */}
       <div className="md:w-3/7 ">
         <ListManager

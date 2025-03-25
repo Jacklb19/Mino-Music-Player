@@ -36,7 +36,6 @@ const Player: React.FC<PlayerProps> = ({
   const [songMaxTime, setSongMaxTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Reconstruye la lista interna y ajusta el nodo actual
   useEffect(() => {
     playlist.current = new DoublyLinkedList<Track>();
     initialPlaylist.forEach((track) => playlist.current.append(track));
@@ -51,7 +50,6 @@ const Player: React.FC<PlayerProps> = ({
     }
   }, [initialPlaylist, currentSongIndex, setCurrentSongIndex]);
 
-  // Play / Pause
   const togglePlayPause = () => {
     if (audioRef.current) {
       isPlaying ? audioRef.current.pause() : audioRef.current.play();
@@ -92,7 +90,6 @@ const Player: React.FC<PlayerProps> = ({
     setIsRepeat(repeatModes[(repeatModes.indexOf(isRepeat) + 1) % repeatModes.length]);
   };
 
-  // Actualización del tiempo de reproducción
   useEffect(() => {
     if (audioRef.current) {
       const audio = audioRef.current;
@@ -123,7 +120,6 @@ const Player: React.FC<PlayerProps> = ({
     if (audioRef.current) audioRef.current.volume = newVolume;
   };
 
-  // Manejo del final de la canción y reproducción continua
   useEffect(() => {
     if (audioRef.current && currentNode) {
       if (audioRef.current.src !== currentNode.value.src) {
@@ -151,45 +147,57 @@ const Player: React.FC<PlayerProps> = ({
     }
   }, [currentNode, isPlaying, isRepeat, currentSongIndex, setCurrentSongIndex]);
 
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   return (
     <div className="w-full flex flex-col justify-center items-center bg-zinc-900 rounded-[35px] 
-     transition-all hover:scale-[1.01] p-4 drop-shadow-[0px_0px_10px_rgba(0,0,0,1)] 
-      md:drop-shadow-[0px_0px_10px_rgba(0,0,0,1)]
-      ml:hover:drop-shadow-[0px_0px_15px_rgba(0,0,0,1)]">
+     transition-all hover:scale-[1.01] p-4 drop-shadow-lg">
       <audio ref={audioRef} />
 
-      {/* Barra de progreso */}
-      <input
-        type="range"
-        min={0}
-        max={songMaxTime || 1}
-        value={songCurrentTime}
-        onChange={handleSeekChange}
-        className="w-full mt-2"
-      />
+      {/* Barra de progreso con tiempos */}
+      <div className="w-full flex items-center justify-center gap-4">
+        <span className="text-white text-sm">{formatTime(songCurrentTime)}</span>
+        <input
+          type="range"
+          min={0}
+          max={songMaxTime || 1}
+          value={songCurrentTime}
+          onChange={handleSeekChange}
+          className="w-full"
+        />
+        <span className="text-white text-sm">{formatTime(songMaxTime)}</span>
+      </div>
 
       {/* Controles del reproductor */}
-      <PlayerControls
-        isPlaying={isPlaying}
-        isShuffle={isShuffle}
-        isRepeat={isRepeat}
-        togglePlayPause={togglePlayPause}
-        nextTrack={handleForwardClick}
-        prevTrack={handleBackwardClick}
-        handleShuffleClick={() => setShuffle(!isShuffle)}
-        handleRepeatClick={handleRepeatClick}
-      />
+      <div className="flex justify-center items-center w-full mt-2">
+        <PlayerControls
+          isPlaying={isPlaying}
+          isShuffle={isShuffle}
+          isRepeat={isRepeat}
+          togglePlayPause={togglePlayPause}
+          nextTrack={handleForwardClick}
+          prevTrack={handleBackwardClick}
+          handleShuffleClick={() => setShuffle(!isShuffle)}
+          handleRepeatClick={handleRepeatClick}
+        />
+      </div>
 
       {/* Control de volumen */}
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        value={volume}
-        onChange={handleVolumeChange}
-        className="w-full mt-2"
-      />
+      <div className="w-full flex justify-center items-center mt-2">
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={handleVolumeChange}
+          className="w-1/4"
+        />
+      </div>
     </div>
   );
 };
