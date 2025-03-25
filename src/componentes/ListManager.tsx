@@ -83,7 +83,7 @@ const ListManager: React.FC<ListManagerProps> = ({
       setCustomTracks(prev => [...newTracks, ...prev]);
     } else if (insertionMode === "custom") {
       const posStr = prompt("Ingrese la posición donde desea agregar las canciones:");
-      let pos = Number(posStr) -1 ;
+      let pos = Number(posStr) ;
       if (isNaN(pos)) pos = customTracks.length;
       // Si el usuario ingresa una posición mayor al número de canciones, se agrega al final
       if (pos > customTracks.length) pos = customTracks.length;
