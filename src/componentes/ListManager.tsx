@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Trash2 } from "lucide-react"; 
+import { Trash2 } from "lucide-react";
+import * as mm from "music-metadata-browser";
 
 interface Track {
   id: string;
@@ -12,20 +13,17 @@ interface Track {
 interface ListManagerProps {
   onSelectSong: (index: number) => void;
   onAddSongs: (songs: Track[]) => void;
-  onRemoveSong: (id: string) => void; 
+  onRemoveSong: (id: string) => void;
 }
 
 const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onRemoveSong }) => {
   const [customTracks, setCustomTracks] = useState<Track[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
-  };
+  // Manejo de arrastrar y soltar
+  const handleDragStart = (index: number) => setDraggedIndex(index);
 
-  const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
-    event.preventDefault();
-  };
+  const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => event.preventDefault();
 
   const handleDrop = (index: number) => {
     if (draggedIndex === null || draggedIndex === index) return;
@@ -35,42 +33,69 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
     updatedTracks.splice(index, 0, movedTrack);
 
     setCustomTracks(updatedTracks);
-    onAddSongs(updatedTracks); // Pasar la lista actualizada al Player
-
+    onAddSongs(updatedTracks); // Actualizar la lista en el Player
     setDraggedIndex(null);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Manejo de subida de archivos
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
-    const newTracks: Track[] = Array.from(files).map((file) => ({
-      id: crypto.randomUUID(),
-      src: URL.createObjectURL(file),
-      song: file.name.replace(/\.[^/.]+$/, ""),
-      artist: "Desconocido",
-      cover: "/default-cover.jpg",
-    }));
+    const newTracks: Track[] = await Promise.all(
+      Array.from(files).map(async (file) => {
+        try {
+          const metadata = await mm.parseBlob(file);
+          const title = metadata.common.title || file.name.replace(/\.[^/.]+$/, "");
+          const artist = metadata.common.artist || "Desconocido";
+          let cover = "/default-cover.jpg";
 
-    setCustomTracks((prev) => [...prev, ...newTracks]);
-    onAddSongs(newTracks);
+          if (metadata.common.picture?.length) {
+            const picture = metadata.common.picture[0];
+            const blob = new Blob([picture.data], { type: picture.format });
+            cover = URL.createObjectURL(blob);
+          }
+
+          return {
+            id: crypto.randomUUID(),
+            src: URL.createObjectURL(file),
+            song: title,
+            artist: artist,
+            cover: cover,
+          };
+        } catch (error) {
+          console.error("Error al leer metadatos:", error);
+          return {
+            id: crypto.randomUUID(),
+            src: URL.createObjectURL(file),
+            song: file.name.replace(/\.[^/.]+$/, ""),
+            artist: "Desconocido",
+            cover: "/default-cover.jpg",
+          };
+        }
+      })
+    );
+
+    setCustomTracks((prevTracks) => {
+      const updatedTracks = [...prevTracks, ...newTracks];
+      onAddSongs(updatedTracks); // Actualizar la lista en el Player
+      return updatedTracks;
+    });
   };
 
+  // Manejo de eliminación de canciones
   const handleRemove = (id: string) => {
-    if (customTracks.length > 1) {
-      setCustomTracks((prev) => prev.filter((track) => track.id !== id));
-      onRemoveSong(id);
-    }
+    setCustomTracks((prev) => prev.filter((track) => track.id !== id));
+    onRemoveSong(id);
   };
-  
+
+  // Manejo de selección de canciones
   const handleSelect = (id: string) => {
-    const indexInPlaylist = customTracks.findIndex(track => track.id === id);
+    const indexInPlaylist = customTracks.findIndex((track) => track.id === id);
     if (indexInPlaylist !== -1) {
       onSelectSong(indexInPlaylist);
     }
   };
-  
-  
 
   return (
     <div className="w-full p-5 bg-gray-900 text-white rounded-xl shadow-lg">
@@ -99,10 +124,10 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
           >
             {/* Imagen de la canción */}
             <img
-                src={song.cover}
-                alt={song.song}
-                className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
-                onClick={() => handleSelect(song.id)} 
+              src={song.cover}
+              alt={song.song}
+              className="w-12 h-12 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => handleSelect(song.id)}
             />
 
             {/* Información de la canción */}
