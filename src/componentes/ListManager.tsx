@@ -81,6 +81,7 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
       onAddSongs(updatedTracks); // Actualizar la lista en el Player
       return updatedTracks;
     });
+    event.target.value = ""
   };
 
   // Manejo de eliminación de canciones
@@ -137,12 +138,14 @@ const ListManager: React.FC<ListManagerProps> = ({ onSelectSong, onAddSongs, onR
             </div>
 
             {/* Botón de eliminar */}
-            <button
-              onClick={() => handleRemove(song.id)}
-              className="text-red-500 hover:text-red-400 transition-all"
-            >
-              <Trash2 size={20} />
-            </button>
+            {customTracks.length > 1 && (
+              <button
+                onClick={() => handleRemove(song.id)}
+                className="text-red-500 hover:text-red-400 transition-all"
+              >
+                <Trash2 size={20} />
+              </button>
+            )}
           </li>
         ))}
       </ul>
