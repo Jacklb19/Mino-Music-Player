@@ -1,15 +1,15 @@
-# React + TypeScript + Vite
+REPRODUCTOR DE MUSICA
+JOSE LUIS BURBANO BUCHELLY
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PARA CORRER EL REPRODUCTOR DE MUSICA SE NECESITA
+-node.js (Version lts (En mi caso tengo la v22.14.0))
+INSTALAR
+-npm install
+-npm run dev
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+PARA AGREGAR CANCIONES SE DEBE DARLE AL BOTON + EN "NOW PLAYING"
+Y AGREGARLAS DESDE UNA CARPETA QUE TENGAS EN TU DISPOSITVO (Nota: No se pueden agregar carpetas enteras)
+SE PUEDE CAMBIAR DE POSICION CADA CANCION ARRASTRANDOLA Y SOLTANDOLA DONDE QUIERAS. 
 
 ```js
 export default tseslint.config({
