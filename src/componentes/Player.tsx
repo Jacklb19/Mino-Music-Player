@@ -176,7 +176,6 @@ const Player: React.FC<PlayerProps> = ({
       <div className="flex justify-center items-center w-full mt-2">
         <PlayerControls
           isPlaying={isPlaying}
-          isShuffle={isShuffle}
           isRepeat={isRepeat}
           togglePlayPause={togglePlayPause}
           nextTrack={handleForwardClick}
