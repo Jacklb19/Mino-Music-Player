@@ -3,7 +3,6 @@ import PlayerControlsProps from "../types/PlayerControlsProps";
 
 const PlayerControls: React.FC<PlayerControlsProps> = ({
   isPlaying,
-  isShuffle,
   isRepeat,
   togglePlayPause,
   nextTrack,
